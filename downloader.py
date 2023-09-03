@@ -40,6 +40,6 @@ class Downloader():
                 print('AAA', filename)
                 return filename
         except youtube_dl.utils.DownloadError:
-            raise Exception(text='Ссылка неверна')
+            raise UrlException
 
 

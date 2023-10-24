@@ -3,6 +3,7 @@ import logging
 import sys
 from os import getenv
 import re
+import os
 
 
 from aiogram import Bot, Dispatcher, Router, types
@@ -16,7 +17,7 @@ from statemanager import StateManager
 from customexceptions import UrlException
 
 
-TOKEN = '<token>'
+TOKEN = '6422464752:AAF6tXf65ELxVmsugxF1SUD3uNhq9IhG9BQ'
 
 dp = Dispatcher()
 state_manager = StateManager()
@@ -39,13 +40,21 @@ async def download_video(message: types.Message) -> None:
         state_manager.set_active_format('.mp3')
         await message.answer('Введите URL аудио', reply_markup=state_manager.get_active_keyboard())
     elif message.text.startswith('http'):
-
+        await message.answer('Пожалуйста, подождите.')
+        # try:
+        #     match state_manager.get_active_format():
+        #         case '.mp4':
+        #             path_to_file = Downloader.download_video(message.text)
+        #         case '.mp3':
+        #             path_to_file = Downloader.download_audio(message.text)
+        # except UrlException as e:
+        #     await message.answer(e.text)
+        path_to_file = ''
         try:
-            match state_manager.get_active_format():
-                case '.mp4':
-                    path_to_file = Downloader.download_video(message.text)
-                case '.mp3':
-                    path_to_file = Downloader.download_audio(message.text)
+            if state_manager.get_active_format() == '.mp4':
+                path_to_file = Downloader.download_video(message.text)
+            elif state_manager.get_active_format() == '.mp3':
+                path_to_file = Downloader.download_audio(message.text)
         except UrlException as e:
             await message.answer(e.text)
 
@@ -58,6 +67,7 @@ async def download_video(message: types.Message) -> None:
     else:
         state_manager.set_active_keyboard('choosing_a_file_type')
         await message.answer(f"Что нужно скачать?", reply_markup=state_manager.get_active_keyboard())
+        os.remove(path_to_file)
 
 
 
